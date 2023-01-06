@@ -38,14 +38,14 @@
                             <input class="form-control" type="text" placeholder="+123 456 789">
                         </div>
                         <div class="col-md-6 form-group">
-                            <label>Address Line 1</label>
-                            <input class="form-control" type="text" placeholder="123 Street">
+                            <label>Province</label>
+                            <select class="custom-select province" name="" id=""></select>
                         </div>
                         <div class="col-md-6 form-group">
-                            <label>Address Line 2</label>
-                            <input class="form-control" type="text" placeholder="123 Street">
+                            <label>District</label>
+                            <select class="custom-select district" name="" id=""></select>
                         </div>
-                        <div class="col-md-6 form-group">
+                        <!-- <div class="col-md-6 form-group">
                             <label>Country</label>
                             <select class="custom-select">
                                 <option selected>United States</option>
@@ -53,14 +53,14 @@
                                 <option>Albania</option>
                                 <option>Algeria</option>
                             </select>
-                        </div>
-                        <div class="col-md-6 form-group">
+                        </div> -->
+                        <!-- <div class="col-md-6 form-group">
                             <label>City</label>
                             <input class="form-control" type="text" placeholder="New York">
-                        </div>
+                        </div> -->
                         <div class="col-md-6 form-group">
-                            <label>State</label>
-                            <input class="form-control" type="text" placeholder="New York">
+                            <label>Ward</label>
+                            <select class="custom-select ward" name="" id=""></select>
                         </div>
                         <div class="col-md-6 form-group">
                             <label>ZIP Code</label>
@@ -196,3 +196,46 @@
         </div>
     </div>
     <!-- Checkout End -->
+    <script>
+        let province = $('.province');
+        let district = $('.district');
+        let ward = $('.ward');
+
+        $(document).ready(async function(){
+
+            let provinceList = await showAllProvince();
+            renderData(province, provinceList);
+
+            province.change(async function(){
+                let b = await getDistricts(province.val());
+                renderData(district, b.districts);
+            })
+
+            district.change(async function(){
+                let b = await getWards(district.val());
+                renderData(ward, b.wards);
+            })
+        })
+
+        function renderData(select, array){
+            select.html('');
+            let html = '<option disable value="">Chọn</option>';
+            $.each(array, (index, item) => {
+                html += `<option value="${item.code}">${item.name}</option>`;
+            })
+            select.append(html);
+        }
+
+        function showAllProvince(){
+            return fetch('https://provinces.open-api.vn/api/p/').then(respone => respone.json());
+        }
+
+        function getDistricts(code){
+            return fetch(`https://provinces.open-api.vn/api/p/${code}?depth=2`).then(respone => respone.json());
+        }
+     
+        function getWards(code){
+            return fetch(`https://provinces.open-api.vn/api/d/${code}?depth=2`).then(respone => respone.json());
+        }
+
+    </script>
